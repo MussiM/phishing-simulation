@@ -6,8 +6,8 @@ export default function authHeader() {
     user = JSON.parse(userStr);
   }
 
-  if (user && user.token) {
-    return { Authorization: 'Bearer ' + user.token };
+  if (user && user.access_token) {
+    return { Authorization: 'Bearer ' + user.access_token };
   } else {
     return {};
   }

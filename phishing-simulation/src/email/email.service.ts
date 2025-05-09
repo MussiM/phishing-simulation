@@ -2,11 +2,12 @@ import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common
 import { ConfigService } from '@nestjs/config';
 import { SendEmailDto } from './dto/send-email.dto';
 import { EmailRepository } from './email.repository';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  client;
+  client: nodemailer.Transporter;
 
   constructor(
     private configService: ConfigService,
@@ -19,30 +20,31 @@ export class EmailService {
       this.logger.log('Initializing SMTP client...');
       
       const user = process.env.SMTP_USER;
-      const password = process.env.SMTP_PASS;
+      const pass = process.env.SMTP_PASS;
       const host = process.env.SMTP_HOST;
       const port = parseInt(process.env.SMTP_PORT);
       
-      if (!user || !password || !host || isNaN(port)) {
+      if (!user || !pass || !host || isNaN(port)) {
         throw new Error('Missing SMTP configuration');
       }
       
-      this.client = new (await import("emailjs")).SMTPClient({
-        user,
-        password,
+      this.client = nodemailer.createTransport({
         host,
-        port
+        port,
+        auth: {
+          user,
+          pass
+        }
       });
       
       this.logger.log('SMTP client initialized successfully');
     } catch (error) {
       this.logger.error(`Error initializing SMTP client: ${error.message}`, error.stack);
-      // We don't throw here to allow the application to start even if email is not configured
     }
   }
 
   async sendEmail(emailDto: SendEmailDto) {
-    const { subject, content, recipient, senderEmail, emailId } = emailDto;
+    const { subject, content, recipient, emailId } = emailDto;
     
     if (!this.client) {
       this.logger.error('SMTP client not initialized');
@@ -52,21 +54,19 @@ export class EmailService {
     try {
       this.logger.log(`Sending email to ${recipient} with subject "${subject}"`);
       
-      const phishingUrl = `${this.configService.get<string>('PHISHING_URL')}/?emailId=${emailId}`;
-      if (!phishingUrl) {
-        this.logger.warn('PHISHING_URL environment variable not set');
-      }
+      const phishingUrl = `${this.configService.get<string>('PHISHING_URL')}?emailId=${emailId}`;
       
       const fullContent = `
         ${content}
         Click here to view the email: ${phishingUrl}
       `;
 
-      await this.client.sendAsync({
-        text: fullContent,
-        from: senderEmail,
+      await this.client.sendMail({
+        from: this.configService.get<string>('PHISHING_SENDER_EMAIL'),
         to: recipient,
-        subject: subject,
+        subject,
+        text: fullContent,
+
       });
 
       this.logger.log(`Email sent successfully to ${recipient}`);

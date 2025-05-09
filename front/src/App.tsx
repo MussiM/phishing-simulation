@@ -1,13 +1,10 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-
-// Components
 import NavigationBar from './components/NavigationBar';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import PhishingSimulation from './components/phishing/PhishingSimulation';
-import PrivateRoute from './components/auth/PrivateRoute';
+import PhishingManagement from './components/PhishingManagement';
 
 function App() {
   return (
@@ -22,10 +19,14 @@ function App() {
             <Route 
               path="/phishing" 
               element={
-                <PrivateRoute>
                   <PhishingSimulation />
-                </PrivateRoute>
               } 
+            />
+            <Route
+              path="/phishingClicked"
+              element={
+                <PhishingManagement />
+              }
             />
           </Routes>
         </div>

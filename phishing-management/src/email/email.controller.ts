@@ -6,12 +6,12 @@ import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Phishing Attempt')
 @Controller('/phishing-attempt')
-@UseGuards(AuthGuard)
 @ApiBearerAuth()
 export class EmailController {
   constructor(private emailService: EmailService) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Send an email' })
   @ApiResponse({
     status: 201,
@@ -26,6 +26,7 @@ export class EmailController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get all emails for the current user' })
   @ApiResponse({
     status: 200,
@@ -36,6 +37,7 @@ export class EmailController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get an email by ID' })
   @ApiResponse({
     status: 200,
@@ -47,5 +49,15 @@ export class EmailController {
   })
   async getPhishingAttemptById(@Param('id') id: string) {
     return this.emailService.getPhishingAttemptById(id);
+  }
+
+  @Post(':id/clicked')
+  @ApiOperation({ summary: 'Update the email status as clicked' })
+  @ApiResponse({
+    status: 200,
+    description: 'Email status updated to clicked',
+  })
+  async updatePhishingAttempt(@Param('id') id: string) {
+    return this.emailService.updatePhishingAttempt(id);
   }
 }

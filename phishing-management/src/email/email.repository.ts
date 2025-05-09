@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import { Email } from '../common/database/entities/email.entity';
 import { User } from '../common/database/entities/user.entity';
+import { SendEmailDto } from './dto/send-email.dto';
 
 @Injectable()
 export class EmailRepository {
@@ -22,6 +23,34 @@ export class EmailRepository {
     } catch (error) {
       this.logger.error(`Error finding user by ID ${userId}: ${error.message}`, error.stack);
       throw new InternalServerErrorException('Failed to find user');
+    }
+  }
+
+  async updateEmailStatus(id: string, status: string) {
+    try {
+      this.logger.log(`Updating email status: ID=${id}, status=${status}`);
+      const email = await this.emailRepository.findOne({ where: { id } });
+      if (!email) {
+        throw new Error(`Email with ID ${id} not found`);
+      }
+      
+      email.deliveryStatus = status;
+      email.updatedAt = new Date();
+      
+      return await this.emailRepository.save(email);
+    } catch (error) {
+      this.logger.error(`Error updating email status for ID ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async createEmail(sendEmailDto: SendEmailDto & { senderId: string }) {
+    try {
+      this.logger.log(`Creating email: ${sendEmailDto.recipient}`);
+      return await this.emailRepository.save(sendEmailDto);
+    } catch (error) {
+      this.logger.error(`Error creating email: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to create email');
     }
   }
 

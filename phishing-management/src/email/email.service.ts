@@ -12,30 +12,26 @@ export class EmailService {
   constructor(
     private configService: ConfigService,
     private emailRepository: EmailRepository,
-    private usersService: UsersService,
   ) {
   }
 
   async sendEmail(userId: string, sendEmailDto: SendEmailDto) {
     try {
-      this.logger.log(`Attempting to send email to user with ID: ${userId}`);
-      const user = await this.usersService.findById(userId);
+      this.logger.log(`Sending email to ${sendEmailDto.recipient}`);
+
+      const email = await this.emailRepository.createEmail({...sendEmailDto, senderId: userId});
       
       const response = await axios.post(this.configService.get('EMAIL_SERVICE_URL'), {
-        email: user.email,
+        emailId: email.id,
+        recipient: sendEmailDto.recipient,
         subject: sendEmailDto.subject,
         content: sendEmailDto.content,
       });
       
-      this.logger.log(`Email sent successfully to ${user.email}`);
+      this.logger.log(`Email sent successfully to ${sendEmailDto.recipient}`);
       return response;
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        this.logger.error(`User not found: ${userId}`);
-        throw error;
-      }
-      
-      this.logger.error(`Failed to send email to user ${userId}: ${error.message}`, error.stack);
+      this.logger.error(`Failed to send email to: ${error.message}`, error.stack);
       throw new InternalServerErrorException('Failed to send email');
     }
   }
@@ -71,6 +67,25 @@ export class EmailService {
       
       this.logger.error(`Failed to fetch phishing attempt ${id}: ${error.message}`, error.stack);
       throw new InternalServerErrorException('Failed to retrieve phishing attempt');
+    }
+  }
+
+  async updatePhishingAttempt(id: string) {
+    try {
+      this.logger.log(`Updating phishing attempt with ID: ${id}`);
+      const attempt = await this.emailRepository.findEmailById(id);
+      
+      if (!attempt) { 
+        this.logger.warn(`Phishing attempt not found with ID: ${id}`);
+        throw new NotFoundException('Phishing attempt not found');
+      }
+      
+      await this.emailRepository.updateEmailStatus(id, 'clicked');
+      this.logger.log(`Phishing attempt updated to clicked: ${id}`);
+      return attempt;
+    } catch (error) {
+      this.logger.error(`Failed to update phishing attempt ${id}: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to update phishing attempt');
     }
   }
 }

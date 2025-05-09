@@ -13,7 +13,8 @@ const Login = () => {
     setMessage('');
     
     AuthService.login(mail, password)
-      .then(() => {
+      .then((user) => {
+        localStorage.setItem('user', JSON.stringify(user));
         navigate('/phishing');
       })
       .catch(error => {

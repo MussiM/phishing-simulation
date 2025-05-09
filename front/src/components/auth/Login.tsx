@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthService from '../../services/auth.service';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [mail, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const Login = () => {
     e.preventDefault();
     setMessage('');
     
-    AuthService.login(username, password)
+    AuthService.login(mail, password)
       .then(() => {
         navigate('/phishing');
       })
@@ -34,13 +34,13 @@ const Login = () => {
         <h2>Login</h2>
         <form onSubmit={handleLogin}>
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="mail">Email</label>
             <input
               type="text"
               className="form-control"
-              name="username"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
+              name="mail"
+              value={mail}
+              onChange={e => setEmail(e.target.value)}
               required
             />
           </div>

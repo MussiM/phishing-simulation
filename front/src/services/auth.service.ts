@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 class AuthService {
-  login(username: string, password: string) {
+  login(email: string, password: string) {
     return axios
-      .post(`${process.env.REACT_APP_API_URL || ''}/login`, {
-        username,
+      .post(`${process.env.REACT_APP_API_URL || ''}auth/login`, {
+        email,
         password
       })
       .then(response => {
@@ -19,9 +19,9 @@ class AuthService {
     localStorage.removeItem('user');
   }
 
-  register(username: string, email: string, password: string) {
-    return axios.post(`${process.env.REACT_APP_API_URL || ''}`, {
-      username,
+  register(name: string, email: string, password: string) {
+    return axios.post(`${process.env.REACT_APP_API_URL || ''}users/register`, {
+      name,
       email,
       password
     });

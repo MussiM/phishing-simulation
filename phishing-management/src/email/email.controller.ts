@@ -1,17 +1,20 @@
-import { Controller, Get, Post, Body, Param, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { EmailService } from './email.service';
 import { SendEmailDto } from './dto/send-email.dto';
+import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@ApiTags('emails')
+@ApiTags('Phishing Attempt')
 @Controller('/phishing')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 export class EmailController {
   constructor(private emailService: EmailService) {}
 
-  @Post('/send')
+  @Post()
   @ApiOperation({ summary: 'Send an email' })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Email successfully sent',
   })
   @ApiResponse({
@@ -22,18 +25,27 @@ export class EmailController {
     return this.emailService.sendEmail(req.user.id, sendEmailDto);
   }
 
-  @Post('/clicked/:emailId')
-  @ApiOperation({ summary: 'Update the email status as clicked' })
-  @ApiParam({ name: 'emailId', description: 'Email ID', example: '668d6b8d6b8d6b8d6b8d6b8d' })
+  @Get()
+  @ApiOperation({ summary: 'Get all emails for the current user' })
   @ApiResponse({
     status: 200,
-    description: 'Email status updated as clicked',
+    description: 'Return all emails for the current user',
+  })
+  async getEmails(@Request() req) {
+    return this.emailService.getEmailsForUser(req.user.id);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get an email by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the email',
   })
   @ApiResponse({
-    status: 500,
-    description: 'Failed to update the email status as clicked',
+    status: 404,
+    description: 'Email not found',
   })
-  async updateEmailStatus(@Request() req, @Param('emailId') emailId: string) {
-    return this.emailService.updateEmailStatus(emailId);
+  async getEmailById(@Param('id') id: string) {
+    return this.emailService.getEmailById(id);
   }
 }

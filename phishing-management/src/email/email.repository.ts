@@ -5,25 +5,26 @@ import { PrismaService } from '../common/prisma/prisma.service';
 export class EmailRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findUserById(id: string) {
+  async findUserById(userId: string) {
     return this.prisma.user.findUnique({
-      where: { id },
+      where: { id: userId },
+    });
+  }
+
+  async findEmailsForUser(userId: string) {
+    return this.prisma.email.findMany({
+      where: {
+        senderId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
   }
 
   async findEmailById(id: string) {
     return this.prisma.email.findUnique({
       where: { id },
-    });
-  }
-
-  async updateEmailStatus(id: string, status: string) {
-    return this.prisma.email.update({
-      where: { id },
-      data: { 
-        deliveryStatus: status,
-        updatedAt: new Date()
-      },
     });
   }
 } 

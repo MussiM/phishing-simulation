@@ -1,0 +1,59 @@
+version: '1.0'
+
+services:
+  phishing-management:
+    build:
+      context: ./phishing-management
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=mongodb://mongodb:27017/mongo?authSource=admin
+      - PORT=3001
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  phishing-simulation:
+    build:
+      context: ./phishing-simulation
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=mongodb://mongodb:27017/mongo?authSource=admin
+      - PORT=3001
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001
+    depends_on:
+      - phishing-management
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data: 

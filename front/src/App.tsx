@@ -1,25 +1,36 @@
 import React from 'react';
-import logo from './logo.svg';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
+
+// Components
+import NavigationBar from './components/NavigationBar';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import PhishingSimulation from './components/phishing/PhishingSimulation';
+import PrivateRoute from './components/auth/PrivateRoute';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <NavigationBar />
+        <div className="container mt-3">
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route 
+              path="/phishing" 
+              element={
+                <PrivateRoute>
+                  <PhishingSimulation />
+                </PrivateRoute>
+              } 
+            />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
 }
 

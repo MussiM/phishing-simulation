@@ -1,30 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../common/prisma/prisma.service';
+import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MongoRepository } from 'typeorm';
+import { Email } from '../common/database/entities/email.entity';
+import { User } from '../common/database/entities/user.entity';
 
 @Injectable()
 export class EmailRepository {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(EmailRepository.name);
+
+  constructor(
+    @InjectRepository(Email)
+    private emailRepository: MongoRepository<Email>,
+    @InjectRepository(User)
+    private userRepository: MongoRepository<User>,
+  ) {}
 
   async findUserById(userId: string) {
-    return this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+    try {
+      this.logger.log(`Finding user by ID: ${userId}`);
+      return await this.userRepository.findOne({ where: { id: userId } });
+    } catch (error) {
+      this.logger.error(`Error finding user by ID ${userId}: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to find user');
+    }
   }
 
   async findEmailsForUser(userId: string) {
-    return this.prisma.email.findMany({
-      where: {
-        senderId: userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    try {
+      this.logger.log(`Finding emails for user: ${userId}`);
+      return await this.emailRepository.find({
+        where: { senderId: userId },
+        order: { createdAt: 'DESC' },
+      });
+    } catch (error) {
+      this.logger.error(`Error finding emails for user ${userId}: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to find emails for user');
+    }
   }
 
   async findEmailById(id: string) {
-    return this.prisma.email.findUnique({
-      where: { id },
-    });
+    try {
+      this.logger.log(`Finding email by ID: ${id}`);
+      return await this.emailRepository.findOne({ where: { id } });
+    } catch (error) {
+      this.logger.error(`Error finding email by ID ${id}: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to find email');
+    }
   }
 } 

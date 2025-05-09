@@ -1,33 +1,39 @@
 version: '1.0'
 
 services:
-  phishing-management:
-    build:
-      context: ./phishing-management
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3001"
-    environment:
-      - DATABASE_URL=mongodb://mongodb:27017/mongo?authSource=admin
-      - PORT=3001
-    depends_on:
-      - mongodb
-    networks:
-      - app-network
+  # phishing-management:
+  #   build:
+  #     context: ./phishing-management
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     - DATABASE_URL=mongodb://mongodb:27017/mongo?authSource=admin
+  #     - PORT=3001
+  #     - EMAIL_SERVICE_URL=http://phishing-simulation:3001/phishing/send
+  #   depends_on:
+  #     - mongodb
+  #   networks:
+  #     - app-network
 
-  phishing-simulation:
-    build:
-      context: ./phishing-simulation
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3001"
-    environment:
-      - DATABASE_URL=mongodb://mongodb:27017/mongo?authSource=admin
-      - PORT=3001
-    depends_on:
-      - mongodb
-    networks:
-      - app-network
+  # phishing-simulation:
+  #   build:
+  #     context: ./phishing-simulation
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3002:3002"
+  #   environment:
+      # - DATABASE_URL=mongodb://mongodb:27017/mongo?authSource=admin
+      # - PORT=3002
+      # - EMAIL_SERVICE_URL=http://phishing-simulation:3001
+      # - SMTP_HOST=smtp.gmail.com
+      # - SMTP_PORT=587
+      # - SMTP_USER=mussish99@gmail.com
+      # - SMTP_PASS=your_app_password
+  #   depends_on:
+  #     - mongodb
+  #   networks:
+  #     - app-network
 
   mongodb:
     image: mongo:latest
@@ -38,18 +44,18 @@ services:
     networks:
       - app-network
 
-  front:
-    build:
-      context: ./front
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://localhost:3001
-    depends_on:
-      - phishing-management
-    networks:
-      - app-network
+  # front:
+  #   build:
+  #     context: ./front
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - REACT_APP_API_URL=http://localhost:3001
+  #   depends_on:
+  #     - phishing-management
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from './common/prisma/prisma.module';
+import { DatabaseModule } from './common/database/database.module';
 import { EmailModule } from './email/email.module';
 
 @Module({
@@ -10,7 +10,7 @@ import { EmailModule } from './email/email.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    PrismaModule,
+    DatabaseModule,
     EmailModule,
   ],
   controllers: [AppController],

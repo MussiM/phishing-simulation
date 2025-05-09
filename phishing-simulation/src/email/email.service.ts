@@ -87,7 +87,7 @@ export class EmailService {
 
   async getEmailById(id: string) {
     try {
-      this.logger.debug(`Getting email by ID: ${id}`);
+      this.logger.log(`Getting email by ID: ${id}`);
       if (!id) {
         this.logger.warn('Attempted to get email with null or empty ID');
         throw new Error('Email ID is required');
@@ -102,7 +102,7 @@ export class EmailService {
 
   async updateEmailStatus(emailId: string, status: string) {
     try {
-      this.logger.debug(`Updating email status: ID=${emailId}, status=${status}`);
+      this.logger.log(`Updating email status: ID=${emailId}, status=${status}`);
       
       if (!emailId) {
         this.logger.warn('Attempted to update status with null or empty emailId');

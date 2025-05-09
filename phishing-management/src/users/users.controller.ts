@@ -8,7 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Post()
+  @Post('/register')
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({
     status: 201,
@@ -20,17 +20,5 @@ export class UsersController {
   })
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
-  }
-
-  @UseGuards()
-  @Get()
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({
-    status: 200,
-    description: 'Return all users',
-  })
-  async findAll() {
-    return this.usersService.findAll();
   }
 }

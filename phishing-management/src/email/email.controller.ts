@@ -5,7 +5,7 @@ import { SendEmailDto } from './dto/send-email.dto';
 import { AuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Phishing Attempt')
-@Controller('/phishing')
+@Controller('/phishing-attempt')
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
 export class EmailController {
@@ -32,7 +32,7 @@ export class EmailController {
     description: 'Return all emails for the current user',
   })
   async getEmails(@Request() req) {
-    return this.emailService.getEmailsForUser(req.user.id);
+    return this.emailService.getPhishingAttempts(req.user.id);
   }
 
   @Get(':id')
@@ -45,7 +45,7 @@ export class EmailController {
     status: 404,
     description: 'Email not found',
   })
-  async getEmailById(@Param('id') id: string) {
-    return this.emailService.getEmailById(id);
+  async getPhishingAttemptById(@Param('id') id: string) {
+    return this.emailService.getPhishingAttemptById(id);
   }
 }

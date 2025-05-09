@@ -13,6 +13,14 @@ export class SendEmailDto {
   content: string;
 
   @ApiProperty({
+    example: 'sender@example.com',
+    description: 'Email of sender',
+  })
+  @IsEmail()
+  @IsNotEmpty()
+  senderEmail: string;
+
+  @ApiProperty({
     example: 'recipient1@example.com',
     description: 'Email of recipient',
   })

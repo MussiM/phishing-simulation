@@ -62,7 +62,6 @@ export class EmailService {
         to: recipient,
         subject: 'Important Announcement',
         text: `Click here to view the email: ${phishingUrl}`,
-
       });
 
       this.logger.log(`Email sent successfully to ${recipient}`);

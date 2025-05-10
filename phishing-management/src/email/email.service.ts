@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailRepository } from './email.repository';
 import { SendEmailDto } from './dto/send-email.dto';
@@ -61,6 +61,9 @@ export class EmailService {
   async getPhishingAttempts(userId: string) {
     try {
       this.logger.log(`Fetching phishing attempts for user: ${userId}`);
+      if (!userId) {
+        throw new BadRequestException('User ID is required');
+      }
       const attempts = await this.emailRepository.findEmailsForUser(userId);
       this.logger.log(`Found ${attempts.length} phishing attempts for user: ${userId}`);
       return attempts;

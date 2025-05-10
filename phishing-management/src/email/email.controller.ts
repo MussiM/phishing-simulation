@@ -22,7 +22,7 @@ export class EmailController {
     description: 'Failed to send email',
   })
   async sendEmail(@Request() req, @Body() sendEmailDto: SendEmailDto) {
-    const userId = req.user.id;
+    const userId = req.user.id || req.user.sub;
     
     return this.emailService.sendEmail(sendEmailDto, userId);
   }
@@ -35,7 +35,8 @@ export class EmailController {
     description: 'Return all emails for the current user',
   })
   async getEmails(@Request() req) {
-    return this.emailService.getPhishingAttempts(req.user.id);
+    const userId = req.user.id || req.user.sub;
+    return this.emailService.getPhishingAttempts(userId);
   }
 
   @Get(':id')

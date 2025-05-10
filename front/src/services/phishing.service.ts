@@ -8,6 +8,10 @@ class PhishingService {
     return axios.post(API_URL + 'phishing-attempt', { recipient: email }, { headers: authHeader() });
   }
 
+  getPhishingAttempts() {
+    return axios.get(API_URL + 'phishing-attempt', { headers: authHeader() });
+  }
+
   getAllPhishingAttempts() {
     return axios.get(API_URL + 'attempts', { headers: authHeader() });
   }

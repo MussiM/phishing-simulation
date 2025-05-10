@@ -10,7 +10,7 @@ services:
     environment:
       - DATABASE_URL=mongodb://mongodb:27017/mongo?authSource=admin
       - PORT=3001
-      - EMAIL_SERVICE_URL=http://phishing-simulation:3001/phishing/send
+      - EMAIL_SERVICE_URL=http://phishing-simulation:3002/phishing/send
     depends_on:
       - mongodb
     networks:
@@ -26,12 +26,12 @@ services:
       - DATABASE_URL=mongodb://mongodb:27017/mongo?authSource=admin
       - PORT=3002
       - JWT_SECRET=your_jwt_secret
-      - EMAIL_SERVICE_URL=http://phishing-simulation:3001
-      - PHISHING_URL=http://phishing-simulation:${PORT}/phishing/landing-page
+      - PHISHING_URL=http://localhost:3002/phishing/landing-page
       - SMTP_HOST=smtp.gmail.com
       - SMTP_PORT=587
       - SMTP_USER=mussish99@gmail.com
       - SMTP_PASS=your_app_password
+      - PHISHING_SENDER_EMAIL=hello@demomailtrap.com
     depends_on:
       - mongodb
     networks:
@@ -51,9 +51,9 @@ services:
       context: ./front
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "80:80"
     environment:
-      - REACT_APP_API_URL=http://localhost:3001
+      - REACT_APP_API_URL=http://phishing-management:3001
     depends_on:
       - phishing-management
     networks:
@@ -64,4 +64,4 @@ networks:
     driver: bridge
 
 volumes:
-  mongodb_data: 
+  mongodb_data:

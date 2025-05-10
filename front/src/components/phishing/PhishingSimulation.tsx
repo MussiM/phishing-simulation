@@ -46,8 +46,7 @@ const PhishingSimulation = () => {
         setMessage('Phishing attempt sent successfully!');
         setEmail('');
         setLoading(false);
-        // Refresh the list after sending a new email
-        fetchPhishingAttempts();
+        setAttempts((prev) => [...prev, {...response.data, deliveryStatus: 'sent'}]);
       })
       .catch(error => {
         const resMessage =

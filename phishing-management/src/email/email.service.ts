@@ -36,7 +36,7 @@ export class EmailService {
       });
       
       this.logger.log(`Email sent successfully to ${sendEmailDto.recipient}`);
-      return response.data;
+      return savedEmail;
     } catch (error) {
       this.logger.error(`Failed to send email: ${error.message}`, error.stack);
       throw new InternalServerErrorException('Failed to send email');

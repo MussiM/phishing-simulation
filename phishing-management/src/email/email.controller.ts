@@ -38,19 +38,4 @@ export class EmailController {
     const userId = req.user.id || req.user.sub;
     return this.emailService.getPhishingAttempts(userId);
   }
-
-  @Get(':id')
-  @UseGuards(AuthGuard)
-  @ApiOperation({ summary: 'Get an email by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Return the email',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Email not found',
-  })
-  async getPhishingAttemptById(@Param('id') id: string) {
-    return this.emailService.getPhishingAttemptById(id);
-  }
 }

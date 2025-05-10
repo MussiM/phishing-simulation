@@ -4,7 +4,6 @@ import NavigationBar from './components/NavigationBar';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import PhishingSimulation from './components/phishing/PhishingSimulation';
-import PhishingManagement from './components/PhishingManagement';
 
 function App() {
   return (
@@ -21,12 +20,6 @@ function App() {
               element={
                   <PhishingSimulation />
               } 
-            />
-            <Route
-              path="/phishingClicked"
-              element={
-                <PhishingManagement />
-              }
             />
           </Routes>
         </div>

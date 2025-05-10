@@ -1,3 +1,4 @@
+import { UUID } from 'crypto';
 import { Entity, ObjectIdColumn, Column, CreateDateColumn, UpdateDateColumn, ObjectId } from 'typeorm';
 
 @Entity()
@@ -6,22 +7,19 @@ export class Email {
   id: ObjectId;
 
   @Column()
-  subject: string;
-
-  @Column()
-  content: string;
-
-  @Column()
   senderId: string;
 
   @Column()
   recipient: string;
 
-  @Column()
+  @Column({ nullable: true })
   sentAt: Date;
 
   @Column({ default: 'pending' })
   deliveryStatus: string;
+
+  @Column({ default: 0 })
+  clicks: number;
 
   @CreateDateColumn()
   createdAt: Date;

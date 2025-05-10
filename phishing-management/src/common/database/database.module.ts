@@ -14,7 +14,7 @@ import { Email } from './entities/email.entity';
         type: 'mongodb',
         url: configService.get('DATABASE_URL'),
         entities: [User, Email],
-        synchronize: true, // Set to false in production
+        synchronize: true,
         useUnifiedTopology: true,
       }),
     }),

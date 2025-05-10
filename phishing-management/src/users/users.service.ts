@@ -76,4 +76,4 @@ export class UsersService {
       throw new InternalServerErrorException('Failed to find user by email');
     }
   }
-} 
+}

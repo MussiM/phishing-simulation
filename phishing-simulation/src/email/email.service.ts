@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { SendEmailDto } from './dto/send-email.dto';
 import { EmailRepository } from './email.repository';
 import * as nodemailer from 'nodemailer';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class EmailService {
@@ -44,7 +45,7 @@ export class EmailService {
   }
 
   async sendEmail(emailDto: SendEmailDto) {
-    const { subject, content, recipient, emailId } = emailDto;
+    const { recipient, emailId } = emailDto;
     
     if (!this.client) {
       this.logger.error('SMTP client not initialized');
@@ -52,25 +53,20 @@ export class EmailService {
     }
     
     try {
-      this.logger.log(`Sending email to ${recipient} with subject "${subject}"`);
+      this.logger.log(`Sending email to ${recipient}"`);
       
-      const phishingUrl = `${this.configService.get<string>('PHISHING_URL')}?emailId=${emailId}`;
-      
-      const fullContent = `
-        ${content}
-        Click here to view the email: ${phishingUrl}
-      `;
+      const phishingUrl = `${this.configService.get<string>('PHISHING_URL')}/${emailId}`;
 
       await this.client.sendMail({
         from: this.configService.get<string>('PHISHING_SENDER_EMAIL'),
         to: recipient,
-        subject,
-        text: fullContent,
+        subject: 'Important Announcement',
+        text: `Click here to view the email: ${phishingUrl}`,
 
       });
 
       this.logger.log(`Email sent successfully to ${recipient}`);
-      await this.updateEmailStatus(emailId, 'sent');
+      await this.updateEmailStatus( new ObjectId(emailId), 'sent');
 
       return {
         id: emailId,
@@ -78,7 +74,7 @@ export class EmailService {
       };
     } catch (error) {
       this.logger.error(`Failed to send email to ${recipient}: ${error.message}`, error.stack);
-      await this.updateEmailStatus(emailId, 'failed');
+      await this.updateEmailStatus( new ObjectId(emailId), 'failed');
       throw new InternalServerErrorException(
         `Failed to send email: ${error.message}`,
       );
@@ -100,7 +96,7 @@ export class EmailService {
     }
   }
 
-  async updateEmailStatus(emailId: string, status: string) {
+  async updateEmailStatus(emailId: ObjectId, status: string) {
     try {
       this.logger.log(`Updating email status: ID=${emailId}, status=${status}`);
       
@@ -121,6 +117,26 @@ export class EmailService {
       this.logger.error(`Failed to update email status for ID ${emailId}: ${error.message}`, error.stack);
       throw new InternalServerErrorException(
         `Failed to update email status: ${error.message}`,
+      );
+    }
+  }
+
+  async updateEmailClicks(emailId: string) {
+    try {
+      this.logger.log(`Updating email clicks: ID=${emailId}`);
+      
+      if (!emailId) {
+        this.logger.warn('Attempted to update clicks with null or empty emailId');
+        throw new Error('Email ID is required');
+      }
+
+      await this.emailRepository.updateEmailClicks(new ObjectId(emailId));
+      
+      this.logger.log(`Email clicks updated: ID=${emailId}`); 
+    } catch (error) {
+      this.logger.error(`Failed to update email clicks for ID ${emailId}: ${error.message}`, error.stack);
+      throw new InternalServerErrorException(
+        `Failed to update email clicks: ${error.message}`,
       );
     }
   }

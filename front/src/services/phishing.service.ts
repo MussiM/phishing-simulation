@@ -5,7 +5,7 @@ const API_URL = process.env.REACT_APP_API_URL || '';
 
 class PhishingService {
   sendPhishingAttempt(email: string) {
-    return axios.post(API_URL + 'phishing-attempt', { email }, { headers: authHeader() });
+    return axios.post(API_URL + 'phishing-attempt', { recipient: email }, { headers: authHeader() });
   }
 
   getAllPhishingAttempts() {

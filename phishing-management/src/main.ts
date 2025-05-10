@@ -12,16 +12,13 @@ async function bootstrap() {
       logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     });
     
-    // Add global validation pipe
     app.useGlobalPipes(new ValidationPipe({
       whitelist: true,
       transform: true,
     }));
     
-    // Configure CORS if needed
     app.enableCors();
     
-    // Swagger setup
     logger.log('Setting up Swagger documentation...');
     const config = new DocumentBuilder()
       .setTitle('Phishing Simulation')

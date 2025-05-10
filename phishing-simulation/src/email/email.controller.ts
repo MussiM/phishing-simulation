@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Param, Request, Logger, InternalServerErrorException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Logger, InternalServerErrorException, Res } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { EmailService } from './email.service';
 import { SendEmailDto } from './dto/send-email.dto';
+import { join } from 'path';
+import { Response } from 'express';
 
 @ApiTags('emails')
 @Controller('/phishing')
@@ -20,9 +22,9 @@ export class EmailController {
     status: 500,
     description: 'Failed to send email',
   })
-  async sendEmail(@Request() req, @Body() sendEmailDto: SendEmailDto) {
+  async sendEmail(@Body() sendEmailDto: SendEmailDto) {
     try {
-      this.logger.log(`Sending email to: ${sendEmailDto.recipient}, subject: ${sendEmailDto.subject}`);
+      this.logger.log(`Sending email to: ${sendEmailDto.recipient}`);
       return await this.emailService.sendEmail(sendEmailDto);
     } catch (error) {
       this.logger.error(`Failed to send email: ${error.message}`, error.stack);
@@ -30,28 +32,27 @@ export class EmailController {
     }
   }
 
-  @Post('/clicked/:emailId')
-  @ApiOperation({ summary: 'Update the email status as clicked' })
-  @ApiParam({ name: 'emailId', description: 'Email ID', example: '668d6b8d6b8d6b8d6b8d6b8d' })
+  @Get('/landing-page/:emailId')
+  @ApiOperation({ summary: 'Return HTML landing page' })
   @ApiResponse({
     status: 200,
-    description: 'Email status updated as clicked',
+    description: 'HTML page returned successfully',
   })
   @ApiResponse({
     status: 500,
-    description: 'Failed to update the email status as clicked',
+    description: 'Failed to return HTML page',
   })
-  async updateEmailStatus(@Request() req, @Param('emailId') emailId: string) {
+  async getHtmlPage(@Res() res: Response, @Param('emailId') emailId: string) {
     try {
-      this.logger.log(`Updating email status to 'clicked' for ID: ${emailId}`);
-      if (!emailId) {
-        this.logger.warn('Attempted to update status with null or empty emailId');
-        throw new InternalServerErrorException('Email ID is required');
-      }
-      return await this.emailService.updateEmailStatus(emailId, 'clicked');
+      this.logger.log(`Serving HTML landing page for email ID: ${emailId}`);
+      
+      await this.emailService.updateEmailClicks(emailId);
+      
+      const filePath = join(process.cwd(), 'src/templates/landing-page.html');
+      return res.sendFile(filePath);
     } catch (error) {
-      this.logger.error(`Failed to update email status: ${error.message}`, error.stack);
-      throw error;
+      this.logger.error(`Failed to serve HTML landing page: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to serve HTML landing page');
     }
   }
 }

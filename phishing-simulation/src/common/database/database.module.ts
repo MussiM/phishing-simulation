@@ -1,7 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
 import { Email } from './entities/email.entity';
 
 @Global()
@@ -13,12 +12,12 @@ import { Email } from './entities/email.entity';
       useFactory: (configService: ConfigService) => ({
         type: 'mongodb',
         url: configService.get('DATABASE_URL'),
-        entities: [User, Email],
-        synchronize: true, // Set to false in production
+        entities: [Email],
+        synchronize: true,
         useUnifiedTopology: true,
       }),
     }),
-    TypeOrmModule.forFeature([User, Email]),
+    TypeOrmModule.forFeature([Email]),
   ],
   exports: [TypeOrmModule],
 })

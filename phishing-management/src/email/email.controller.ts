@@ -22,7 +22,9 @@ export class EmailController {
     description: 'Failed to send email',
   })
   async sendEmail(@Request() req, @Body() sendEmailDto: SendEmailDto) {
-    return this.emailService.sendEmail(req.user.id, sendEmailDto);
+    const userId = req.user.id;
+    
+    return this.emailService.sendEmail(sendEmailDto, userId);
   }
 
   @Get()
@@ -49,15 +51,5 @@ export class EmailController {
   })
   async getPhishingAttemptById(@Param('id') id: string) {
     return this.emailService.getPhishingAttemptById(id);
-  }
-
-  @Post(':id/clicked')
-  @ApiOperation({ summary: 'Update the email status as clicked' })
-  @ApiResponse({
-    status: 200,
-    description: 'Email status updated to clicked',
-  })
-  async updatePhishingAttempt(@Param('id') id: string) {
-    return this.emailService.updatePhishingAttempt(id);
   }
 }

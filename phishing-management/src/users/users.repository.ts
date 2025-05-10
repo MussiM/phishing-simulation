@@ -42,4 +42,4 @@ export class UsersRepository {
       throw new InternalServerErrorException('Failed to find user by ID');
     }
   }
-} 
+}
